@@ -1,14 +1,12 @@
 import re
-
+import sys
+import os.path
 
 class Process(object):
     def __init__(self):
         self.uid = "" #the character that identifies the process
         self.frames = 0 #the number of memeory frames the process uses
         self.times = [] #pairs of tuples of form: (arrival_time, exit_time)
-
-
-
 
 def parse_file(filename):
     ret = []
@@ -26,6 +24,24 @@ def parse_file(filename):
     return ret
 
 
-if(__name__ == "__main__"):
-    for item in parse_file("inputFile.txt"):
-        print item.uid, item.frames, item.times
+def main():
+    args = sys.argv
+    if not (len(args) == 3 or len(args) == 4):
+        print "USAGE: main.py [-q] <input-file> { first | best | next | worst }"
+    else:
+        quietmode = False
+        if(args[1]) == "-q":
+            quietmode = True
+        filename = args[1 + quietmode]
+        if not os.path.exists(filename):
+            print "ERROR: Invalid file"
+            return
+        mode = str.lower(args[2 + quietmode])
+        modes = ["first","best","next","worst"]
+        if mode not in modes:
+            print "ERROR: Invalid mode"
+            return
+        print "filename --> %s \nmode --> %s"%(filename,mode)
+
+if __name__ == "__main__":
+    main()
