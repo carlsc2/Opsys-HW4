@@ -84,11 +84,14 @@ class Core(object):
 
 
     def Defrag(self):
-        ProcList = list("")
+        ProcList = []
         print "Performing defragmentation..."
+        first = False
         for i in range(1600):
+            if self.memory[i] == ".":
+                first = True
             if self.memory[i] != ".":
-                if (self.memory[i] not in ProcList):#get a list of all processes we touched
+                if first and self.memory[i] not in ProcList:#get a list of all processes we touched
                     ProcList.append(self.memory[i])
                 indexHolder = i
                 #while there's room to push back and the previous area is free
