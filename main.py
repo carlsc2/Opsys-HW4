@@ -15,13 +15,14 @@ class Core(object):
         stringHolder = ""
         counter = 0
         for item in self.memory:
-            stringHolder += item.uid
+            stringHolder += item
 
             counter += 1
             if counter == self.framesPerLine:
                 counter = 0
                 print stringHolder
                 stringHolder = ""
+
 
     def SwapMemoryLocations(self, index1, index2):
         memHolder = self.memory[index1]
@@ -34,29 +35,27 @@ class Core(object):
             if frame == process.uid:
                 frame = "."
 
+    def add_process(self, process):
+        #add a process to memory, return True if succeed, False if failed to add
+        pass
+
     def run(self):
         #run the simulation -- if the quiet flag is specified, don't wait for user input
         done = False
         while not done:
+
             #move time forward to the next event
-            pnext = None#the next process
-            nexttime = -1
             for process in self.processes:#find the next event
                 for i,k in enumerate(process.times):
                     s,e = k#get start and end times
-                    if s > self.time:
-                        pass
-                    elif e > self.time:
-                        pass
+                    if s == self.time:
+                        if not add_process(process):
+                            break
+                    elif e == self.time:
+                        remove_process(process)
 
 
-            if pnext != None:
-                self.time = nexttime
-
-
-
-
-            pass
+            self.time += 1#increment time by 1 ms
 
 
 class Process(object):
