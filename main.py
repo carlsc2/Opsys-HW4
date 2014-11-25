@@ -31,12 +31,13 @@ class Core(object):
 
     def remove_process(self, process):
         #remove a process from memory
-        for frame in self.memory:
-            if frame == process.uid:
-                frame = "."
+        for i in range(1600):
+            if self.memory[i] == process.uid:
+                self.memory[i] = "."
 
     def run(self):
         #run the simulation -- if the quiet flag is specified, don't wait for user input
+        endtime = max(event[1] for process in self.processes for event in process.times)
         while True:
             #move time forward to the next event
             ps = []#processes to start this frame
@@ -49,13 +50,13 @@ class Core(object):
                     elif e == self.time:
                         pe.append(process)
             for process in pe:#for each process to end this frame
-                remove_process(process)#end it
+                self.remove_process(process)#end it
                 if self.quietmode:#if automatic, print event
                     self.PrintMemory()#print memory and time
             for process in ps:#for each process to start this frame
-                if not add_process(process):#if the process failed to allocate memory, return
+                if not self.add_process(process):#if the process failed to allocate memory, return
                     self.Defrag()
-                    if not add_process(process):
+                    if not self.add_process(process):
                         print "ERROR: OUT-OF-MEMORY"
                         return
                 if self.quietmode:#if automatic, print event
@@ -63,32 +64,32 @@ class Core(object):
 
             if not self.quietmode and self.time >= self.jumptime:#if not quiet mode, wait for user input
                 self.PrintMemory()#print memory and time
-                done = False
-                while not done:
-                    tmp = int(raw_input("Enter an integer t: "))
-                    if tmp == 0:
-                        return
-                    if tmp <= self.time:
-                        print "ERROR: t must be greater than current time"
-                    self.jumptime = tmp
+                while True:
+                    try:
+                        tmp = int(raw_input("Enter an integer t: "))
+                        self.jumptime = tmp
+                        if tmp == 0:
+                            return
+                        if tmp <= self.time:
+                            print "ERROR: t must be greater than current time"
+                        else:
+                            break
+                    except:
+                        pass
+            if self.time == endtime:#if time is past end point, break
+                if not self.quietmode:
+                    self.PrintMemory()#print memory and time
+                break
             self.time += 1#increment time by 1 ms
 
+
     def Defrag(self):
-        """
-        for i in range (80, 170):
-            self.memory[i] = "A"
-        for i in range(400, 598):
-            self.memory[i] = "B"
-        """
-
         ProcList = list("")
-
         print "Performing defragmentation..."
         for i in range(1600):
             if self.memory[i] != ".":
                 if (self.memory[i] not in ProcList):#get a list of all processes we touched
                     ProcList.append(self.memory[i])
-
                 indexHolder = i
                 #while there's room to push back and the previous area is free
                 while indexHolder > 0 and self.memory[indexHolder - 1] == ".":
@@ -99,17 +100,13 @@ class Core(object):
         for item in self.memory:
             if item == ".":
                 freeBlockSize += 1
-
         freeBlockPercentage = float(freeBlockSize) / 1600
-
-        print "Relocated %d processes to create a free block of %d units (%f%% of total memory).\n" %(len(ProcList), freeBlockSize, freeBlockPercentage)
-
+        print "Relocated %d processes to create a free block of %d units (%.2f%% of total memory).\n" %(len(ProcList), freeBlockSize, freeBlockPercentage*100)
 
     def add_process(self, process):
-        #FIRST - puts new prog in first contiguous chunk of mem where it fits.--------------------------
-
+        #FIRST - puts new prog in first contiguous chunk of mem where it fits.-------------------------
+        startLock = False
         if self.mode == 'first':
-            startLock = False
             startPos = 0
             incrementAmount = 0
             addSuccessful = False
@@ -130,29 +127,30 @@ class Core(object):
                 return True
 
     	#BEST - puts new prog in smallest fitting chunk of free mem-------------------------------------
-        if self.mode == 'best':
+        elif self.mode == 'best':
             bestfree = 1601
             beststart = 0
             for i in range(1600):
                 if self.memory[i] == "." and startLock == False:#start of free space
                     startPos = i
                     startLock = True
-                if startLock == True and self.memory[i] != ".":
+                if startLock == True and self.memory[i] != "." or i == 1599:
                     startLock = False
-                    freelen = i - startLock
+                    freelen = i -startPos
+                    print "freleen:",freelen
                     if freelen >= process.frames:
                         if freelen < bestfree:
                             bestfree = freelen
                             beststart = startPos
             if bestfree <= 1600:
-                for i in range(startPos, i + 1):
+                for i in range(startPos, startPos + process.frames):
                     self.memory[i] = process.uid
                 return True
             else:
                 return False
 
     	#NEXT - puts new prog after all current progs---------------------------------------------------
-    	if self.mode == 'next':
+    	elif self.mode == 'next':
             i = 1599
             while i >= 0:
                 if self.memory[i] != ".":
@@ -161,21 +159,21 @@ class Core(object):
             chunksize = 1599 - i
             if chunksize >= process.frames:
                 i += 1
-                for i in range(startPos, i + 1):
+                for i in range(i, i+process.frames):
                     self.memory[i] = process.uid
                 return True
             else:
                 return False
 
     	#WORST - puts new prog in largest fitting chunk of free mem-------------------------------------
-        if self.mode == 'worst':
+        elif self.mode == 'worst':
             bestfree = -1
             beststart = 0
             for i in range(1600):
                 if self.memory[i] == "." and startLock == False:#start of free space
                     startPos = i
                     startLock = True
-                if startLock == True and self.memory[i] != ".":
+                if startLock == True and self.memory[i] != "." or i == 1599:
                     startLock = False
                     freelen = i - startLock
                     if freelen >= process.frames:
@@ -183,18 +181,18 @@ class Core(object):
                             bestfree = freelen
                             beststart = startPos
             if bestfree >= 0:
-                for i in range(startPos, i + 1):
+                for i in range(startPos, startPos + process.frames):
                     self.memory[i] = process.uid
                 return True
             else:
                 return False
 
         #NONCONTIG - puts new prog in largest fitting chunk of free mem-------------------------------------
-        if self.mode == "noncontig":
+        elif self.mode == "noncontig":
             counter = process.frames
             for i in range(1600):
                 if self.memory[i]== ".":
-                    self.memory[i] = procname
+                    self.memory[i] = process.uid
                     counter -= 1
                 if counter == 0:
                     break
@@ -244,6 +242,7 @@ def main():
             print "ERROR: Invalid mode"
             return
         c = Core(quietmode, filename, mode)
+        c.run()
 
 if __name__ == "__main__":
     main()
