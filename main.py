@@ -4,12 +4,11 @@ import os.path
 
 class Core(object):
     def __init__(self,quiet,filename,mode):
-        self.isContiguous = True
-        self.memory = "."*1600
+        self.memory = "."*1600#string that represents current state of memory
         self.framesPerLine = 80
-        self.processes = parse_file(filename)
-        self.quietmode = quiet
-        self.mode = mode
+        self.processes = parse_file(filename)#list of Process() instances
+        self.quietmode = quiet #True = no interact, False = interact with user
+        self.mode = mode#the algorithm to run
 
     def PrintMemory(self):
         stringHolder = ""
@@ -30,13 +29,14 @@ class Core(object):
 
 
 
+
 class Process(object):
     def __init__(self):
         self.uid = "." #the character that identifies the process
         self.frames = 0 #the number of memory frames the process uses
         self.times = [] #pairs of tuples of form: (arrival_time, exit_time)
 
-def parse_file(filename):
+def parse_file(filename):#parse the input file, return a list of Process() instances with data filled in
     ret = []
     f = open(filename)
     num_processes = int(f.readline().rstrip())#get first line
@@ -55,7 +55,7 @@ def parse_file(filename):
 def main():
     args = sys.argv
     if not (len(args) == 3 or len(args) == 4):
-        print "USAGE: main.py [-q] <input-file> { first | best | next | worst }"
+        print "USAGE: memsim [-q] <input-file> { noncontig | first | best | next | worst }"
     else:
         quietmode = False
         if(args[1]) == "-q":
@@ -65,7 +65,7 @@ def main():
             print "ERROR: Invalid file"
             return
         mode = str.lower(args[2 + quietmode])
-        modes = ["first","best","next","worst"]
+        modes = ["first","best","next","worst","noncontig"]
         if mode not in modes:
             print "ERROR: Invalid mode"
             return
