@@ -86,7 +86,7 @@ class Core(object):
 
     def add_process(self, process):
         #FIRST - puts new prog in first contiguous chunk of mem where it fits.--------------------------
-        if mode == 'first':
+        if self.mode == 'first':
             startLock = False
             startPos = 0
             incrementAmount = 0
@@ -95,6 +95,9 @@ class Core(object):
                 if self.memory[i] == "." and startLock == False:#start of free space
                     startPos = i
                     startLock = True
+
+                if startLock == True and self.memory[i] != ".":
+                    startLock = False
 
                 if startLock == True and i - startPos >= process.frames:#reach suitable amount of room
                     for i in range(startPos, i + 1):
@@ -108,67 +111,91 @@ class Core(object):
                 return True
 
 
-    """
     	#BEST - puts new prog in smallest fitting chunk of free mem-------------------------------------
-    	if mode == 'best'
-    		increment through mem
-    			if '.' found
-    				remember that location
-    				increment as long as still '.', keeping track of how far youve incremented
-    					keep incrementing until not '.'
-    				if amount of '.' incremented though >= size of proc
-    					if first time getting this far, simply store first '.' location and length of free space.
-    					else if an area already stored, overright if this has a smaller free space.
-    		insert prog at the stored '.' location
+        if self.mode == 'best':
+            bestfree = 1601
+            beststart = 0
 
-    		if proc not inserted
-    			need to defrag and run again
-    			if already degragged and still not added
-    				exit simulation with 'out of memory' error
+            for i in range(1600):
+                if self.memory[i] == "." and startLock == False:#start of free space
+                    startPos = i
+                    startLock = True
+
+                if startLock == True and self.memory[i] != ".":
+                    startLock = False
+                    freelen = i - startLock
+                    if freelen >= process.frames:
+                        if freelen < bestfree:
+                            bestfree = freelen
+                            beststart = startPos
+
+            if bestfree <= 1600:
+                for i in range(startPos, i + 1):
+                    self.memory[i] = process.uid
+                return True
+            else:
+                return False
+
 
     	#NEXT - puts new prog after all current progs---------------------------------------------------
-    	if mode == 'next'
-    		decrement through mem from end
-    			keep counter of how far you have decremented
-    			if something other than '.' found
-    				break
-    		if counter is >= prog size
-    			increment once (to be in empty mem again) and insert prog
+    	if self.mode == 'next':
+            i = 1599
+            while i >= 0:
+                if self.memory[i] != ".":
+                    break
+                i-=1
 
-    		if proc not inserted
-    			need to defrag and run again
-    			if already degragged and still not added
-    				exit simulation with 'out of memory' error
+            chunksize = 1599 - i
+
+            if chunksize >= process.frames:
+                i += 1
+                for i in range(startPos, i + 1):
+                    self.memory[i] = process.uid
+                return True
+            else:
+                return False
+
+
 
     	#WORST - puts new prog in largest fitting chunk of free mem-------------------------------------
-    	if mode == 'worst'
-    		increment through mem
-    			if '.' found
-    				remember that location
-    				increment as long as still '.', keeping track of how far youve incremented
-    					keep incrementing until not '.'
-    				if amount of '.' incremented though >= size of proc
-    					if first time getting this far, simply store first '.' location and length of free space.
-    					else if an area already stored, overright if this has a larger free space.
-    		insert prog at the stored '.' location
+        if self.mode == 'worst':
+            bestfree = -1
+            beststart = 0
 
-    		if proc not inserted
-    			need to defrag and run again
-    			if already degragged and still not added
-    				exit simulation with 'out of memory' error
-    	# NONCONTIG - self explanatory
-    	if mode == 'noncontig':
-    		counter = "PROCSIZE"
-    		for i in range(1600):
-                if self.memory[i] == ".":
-                    self.memory[i] = "procName"
-    				counter -= 1
-    				if counter == 0:
-    					break
-    		if counter != 0:
-    			exit simulation with 'out of memory' error
-    	"""
+            for i in range(1600):
+                if self.memory[i] == "." and startLock == False:#start of free space
+                    startPos = i
+                    startLock = True
 
+                if startLock == True and self.memory[i] != ".":
+                    startLock = False
+                    freelen = i - startLock
+                    if freelen >= process.frames:
+                        if freelen > bestfree:
+                            bestfree = freelen
+                            beststart = startPos
+
+            if bestfree >= 0:
+                for i in range(startPos, i + 1):
+                    self.memory[i] = process.uid
+                return True
+            else:
+                return False
+
+        #NONCONTIG - puts new prog in largest fitting chunk of free mem-------------------------------------
+        if self.mode == "noncontig":
+            counter = process.frames
+            for i in range(1600):
+                if self.memory[i]== ".":
+                    self.memory[i] = procname
+                    counter -= 1
+                if counter == 0:
+                    break
+            if counter != 0:
+                print "ERROR: OUT-OF-MEMORY"
+                sys.exit()
+            else:
+                return True
 
 class Process(object):
     def __init__(self):
