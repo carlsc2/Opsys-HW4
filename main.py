@@ -4,11 +4,12 @@ import os.path
 
 class Core(object):
     def __init__(self,quiet,filename,mode):
-        self.memory = "."*1600#string that represents current state of memory
+        self.memory = ["."]*1600#string that represents current state of memory
         self.framesPerLine = 80
         self.processes = parse_file(filename)#list of Process() instances
         self.quietmode = quiet #True = no interact, False = interact with user
         self.mode = mode#the algorithm to run
+        self.time = 0
 
     def PrintMemory(self):
         stringHolder = ""
@@ -27,7 +28,35 @@ class Core(object):
         self.memory[index1] = self.memory[index2]
         self.memory[index2] = memHolder
 
+    def remove_process(self, process):
+        #remove a process from memory
+        for frame in self.memory:
+            if frame == process.uid:
+                frame = "."
 
+    def run(self):
+        #run the simulation -- if the quiet flag is specified, don't wait for user input
+        done = False
+        while not done:
+            #move time forward to the next event
+            pnext = None#the next process
+            nexttime = -1
+            for process in self.processes:#find the next event
+                for i,k in enumerate(process.times):
+                    s,e = k#get start and end times
+                    if s > self.time:
+                        pass
+                    elif e > self.time:
+                        pass
+
+
+            if pnext != None:
+                self.time = nexttime
+
+
+
+
+            pass
 
 
 class Process(object):
