@@ -1,10 +1,26 @@
 import re
 
 
+class Core(object):
+    def __init__(self):
+        self.isContiguous = True
+        self.memory = []
+
+        for i in range(1600):
+
+            self.memory.append(Process())
+
+    def SwapMemoryLocations(self, index1, index2):
+        memHolder = self.memory[index1]
+        self.memory[index1] = self.memory[index2]
+        self.memory[index2] = memHolder
+
+
+
 class Process(object):
     def __init__(self):
         self.uid = "" #the character that identifies the process
-        self.frames = 0 #the number of memeory frames the process uses
+        self.frames = 0 #the number of memory frames the process uses
         self.times = [] #pairs of tuples of form: (arrival_time, exit_time)
 
 
@@ -29,3 +45,5 @@ def parse_file(filename):
 if(__name__ == "__main__"):
     for item in parse_file("inputFile.txt"):
         print item
+
+    c = Core()
