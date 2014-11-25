@@ -44,10 +44,6 @@ def parse_file(filename):
 
 if(__name__ == "__main__"):
     for item in parse_file("inputFile.txt"):
-<<<<<<< HEAD
-        print item
+        print item.uid, item.frames, item.times
 
     c = Core()
-=======
-        print item.uid, item.frames, item.times
->>>>>>> b4eae02ac35ebb005976204d6a029c14eb2fab94
