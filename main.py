@@ -43,9 +43,6 @@ class Core(object):
                     self.SwapMemoryLocations(indexHolder, indexHolder - 1)
                     indexHolder -= 1
 
-<<<<<<< HEAD
-                startLock = False
-                endFreeMem = False
 				
 	def AddProc(self):
 	"""	
@@ -126,9 +123,7 @@ class Core(object):
 		if counter != 0:
 			exit simulation with 'out of memory' error
 	"""
-=======
 
->>>>>>> 48c3b52e2c3c5c581a8cf6d3e1cc452bd7723c0f
 
 class Process(object):
     def __init__(self):
