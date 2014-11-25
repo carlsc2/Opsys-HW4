@@ -6,9 +6,27 @@ class Core(object):
         self.isContiguous = True
         self.memory = []
 
-        for i in range(1600):
+        self.numProcessFrames = 1600
+        self.framesPerLine = 80
 
+        for i in range(self.numProcessFrames):
             self.memory.append(Process())
+
+    def PrintMemory(self):
+        stringHolder = ""
+        counter = 0
+        for item in self.memory:
+            stringHolder += item.uid
+
+            counter += 1
+            if counter == self.framesPerLine:
+                counter = 0
+                print stringHolder
+                stringHolder = ""
+
+
+                
+
 
     def SwapMemoryLocations(self, index1, index2):
         memHolder = self.memory[index1]
@@ -19,7 +37,7 @@ class Core(object):
 
 class Process(object):
     def __init__(self):
-        self.uid = "" #the character that identifies the process
+        self.uid = "." #the character that identifies the process
         self.frames = 0 #the number of memory frames the process uses
         self.times = [] #pairs of tuples of form: (arrival_time, exit_time)
 
@@ -47,3 +65,4 @@ if(__name__ == "__main__"):
         print item.uid, item.frames, item.times
 
     c = Core()
+    c.PrintMemory()
