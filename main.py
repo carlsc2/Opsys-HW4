@@ -9,32 +9,76 @@ class Core(object):
         self.processes = parse_file(filename)#list of Process() instances
         self.quietmode = quiet #True = no interact, False = interact with user
         self.mode = mode#the algorithm to run
-
-    def FreeMemory(self, procName):
-        for i in range(1600):
-            if self.memory[i] == procName:
-                self.memory[i] = "."
+        self.time = 0
+        self.jumptime = 0
 
     def PrintMemory(self):
+        print "Memory at time %d:"%self.time
         stringHolder = ""
         counter = 0
         for item in self.memory:
             stringHolder += item
-
             counter += 1
             if counter == self.framesPerLine:
                 counter = 0
                 print stringHolder
                 stringHolder = ""
 
-
     def SwapMemoryLocations(self, index1, index2):
         memHolder = self.memory[index1]
         self.memory[index1] = self.memory[index2]
         self.memory[index2] = memHolder
 
+    def remove_process(self, process):
+        #remove a process from memory
+        for frame in self.memory:
+            if frame == process.uid:
+                frame = "."
+
+    def add_process(self, process):
+        #add a process to memory, return True if succeed, False if failed to add
+        pass
+
+    def run(self):
+        #run the simulation -- if the quiet flag is specified, don't wait for user input
+        while True:
+            #move time forward to the next event
+            ps = []#processes to start this frame
+            pe = []#processes to end this frame
+            for process in self.processes:#find the next event
+                for i,k in enumerate(process.times):
+                    s,e = k#get start and end times
+                    if s == self.time:
+                        ps.append(process)
+                    elif e == self.time:
+                        pe.append(process)
+            for process in pe:#for each process to end this frame
+                remove_process(process)#end it
+                if self.quietmode:#if automatic, print event
+                    self.PrintMemory()#print memory and time
+            for process in ps:#for each process to start this frame
+                if not add_process(process):#if the process failed to allocate memory, return
+                    self.Defrag()
+                    if not add_process(process):
+                        print "ERROR: OUT-OF-MEMORY"
+                        return
+                if self.quietmode:#if automatic, print event
+                    self.PrintMemory()#print memory and time
+
+            if not self.quietmode and self.time >= self.jumptime:#if not quiet mode, wait for user input
+                self.PrintMemory()#print memory and time
+                done = False
+                while not done:
+                    tmp = int(raw_input("Enter an integer t: "))
+                    if tmp == 0:
+                        return
+                    if tmp <= self.time:
+                        print "ERROR: t must be greater than current time"
+                    self.jumptime = tmp
+            self.time += 1#increment time by 1 ms
 
     def Defrag(self):
+        print "Performing defragmentation..."
         for i in range(1600):
             if self.memory[i] != ".":
                 indexHolder = i
@@ -42,6 +86,7 @@ class Core(object):
                 while indexHolder > 0 and self.memory[indexHolder - 1] == ".":
                     self.SwapMemoryLocations(indexHolder, indexHolder - 1)
                     indexHolder -= 1
+<<<<<<< HEAD
 
 				
 	def AddProc(self, process):
@@ -133,6 +178,9 @@ class Core(object):
     			exit simulation with 'out of memory' error
     	"""
 
+=======
+        print "Defragmentation completed."
+>>>>>>> 9b0da5e901cc34f5d19a11d59d1053d5b5c3c790
 
 class Process(object):
     def __init__(self):
