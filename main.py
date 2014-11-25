@@ -74,18 +74,40 @@ class Core(object):
             self.time += 1#increment time by 1 ms
 
     def Defrag(self):
+        """
+        for i in range (80, 170):
+            self.memory[i] = "A"
+        for i in range(400, 598):
+            self.memory[i] = "B"
+        """
+
+        ProcList = list("")
+
         print "Performing defragmentation..."
         for i in range(1600):
             if self.memory[i] != ".":
+                if (self.memory[i] not in ProcList):#get a list of all processes we touched
+                    ProcList.append(self.memory[i])
+
                 indexHolder = i
                 #while there's room to push back and the previous area is free
                 while indexHolder > 0 and self.memory[indexHolder - 1] == ".":
                     self.SwapMemoryLocations(indexHolder, indexHolder - 1)
                     indexHolder -= 1
         print "Defragmentation completed."
+        freeBlockSize = 0
+        for item in self.memory:
+            if item == ".":
+                freeBlockSize += 1
+
+        freeBlockPercentage = float(freeBlockSize) / 1600
+
+        print "Relocated %d processes to create a free block of %d units (%f%% of total memory).\n" %(len(ProcList), freeBlockSize, freeBlockPercentage)
+
 
     def add_process(self, process):
         #FIRST - puts new prog in first contiguous chunk of mem where it fits.--------------------------
+
         if self.mode == 'first':
             startLock = False
             startPos = 0
@@ -95,32 +117,26 @@ class Core(object):
                 if self.memory[i] == "." and startLock == False:#start of free space
                     startPos = i
                     startLock = True
-
                 if startLock == True and self.memory[i] != ".":
                     startLock = False
-
                 if startLock == True and i - startPos >= process.frames:#reach suitable amount of room
                     for i in range(startPos, i + 1):
                         self.memory[i] = process.uid
                     addSuccessful = True
                     break
-
             if addSuccessful == False:
                 return False
             else:
                 return True
 
-
     	#BEST - puts new prog in smallest fitting chunk of free mem-------------------------------------
         if self.mode == 'best':
             bestfree = 1601
             beststart = 0
-
             for i in range(1600):
                 if self.memory[i] == "." and startLock == False:#start of free space
                     startPos = i
                     startLock = True
-
                 if startLock == True and self.memory[i] != ".":
                     startLock = False
                     freelen = i - startLock
@@ -128,14 +144,12 @@ class Core(object):
                         if freelen < bestfree:
                             bestfree = freelen
                             beststart = startPos
-
             if bestfree <= 1600:
                 for i in range(startPos, i + 1):
                     self.memory[i] = process.uid
                 return True
             else:
                 return False
-
 
     	#NEXT - puts new prog after all current progs---------------------------------------------------
     	if self.mode == 'next':
@@ -144,9 +158,7 @@ class Core(object):
                 if self.memory[i] != ".":
                     break
                 i-=1
-
             chunksize = 1599 - i
-
             if chunksize >= process.frames:
                 i += 1
                 for i in range(startPos, i + 1):
@@ -155,18 +167,14 @@ class Core(object):
             else:
                 return False
 
-
-
     	#WORST - puts new prog in largest fitting chunk of free mem-------------------------------------
         if self.mode == 'worst':
             bestfree = -1
             beststart = 0
-
             for i in range(1600):
                 if self.memory[i] == "." and startLock == False:#start of free space
                     startPos = i
                     startLock = True
-
                 if startLock == True and self.memory[i] != ".":
                     startLock = False
                     freelen = i - startLock
@@ -174,7 +182,6 @@ class Core(object):
                         if freelen > bestfree:
                             bestfree = freelen
                             beststart = startPos
-
             if bestfree >= 0:
                 for i in range(startPos, i + 1):
                     self.memory[i] = process.uid
@@ -239,7 +246,7 @@ def main():
         c = Core(quietmode, filename, mode)
 
         c.Defrag()
-        c.PrintMemory()
+        #c.PrintMemory()
 
 if __name__ == "__main__":
     main()
