@@ -44,85 +44,94 @@ class Core(object):
                     indexHolder -= 1
 
 				
-	def AddProc(self):
-	"""	
-	#FIRST - puts new prog in first contiguous chunk of mem where it fits.--------------------------
-	if mode == 'first'
-		increment through mem
-			if '.' found, 
-				remember that location
-				keep incrementingas long as still '.', keeping track of how far youve incremented
-					if amount of '.' incremented through  == size of proc
-						enter it in mem starting at where '.' was first found.
-						no need to keep incrementing, break
-		if proc not inserted
-			defrag and run again
-			if already degragged and still not added
-				exit simulation with 'out of memory' error
-
-
-	#BEST - puts new prog in smallest fitting chunk of free mem-------------------------------------
-	if mode == 'best'
-		increment through mem
-			if '.' found
-				remember that location
-				increment as long as still '.', keeping track of how far youve incremented
-					keep incrementing until not '.'
-				if amount of '.' incremented though >= size of proc
-					if first time getting this far, simply store first '.' location and length of free space.
-					else if an area already stored, overright if this has a smaller free space.
-		insert prog at the stored '.' location
-
-		if proc not inserted
-			need to defrag and run again
-			if already degragged and still not added
-				exit simulation with 'out of memory' error
- 
-	#NEXT - puts new prog after all current progs---------------------------------------------------
-	if mode == 'next'
-		decrement through mem from end
-			keep counter of how far you have decremented
-			if something other than '.' found
-				break
-		if counter is >= prog size
-			increment once (to be in empty mem again) and insert prog
-
-		if proc not inserted
-			need to defrag and run again
-			if already degragged and still not added
-				exit simulation with 'out of memory' error
-
-	#WORST - puts new prog in largest fitting chunk of free mem-------------------------------------
-	if mode == 'worst'
-		increment through mem
-			if '.' found
-				remember that location
-				increment as long as still '.', keeping track of how far youve incremented
-					keep incrementing until not '.'
-				if amount of '.' incremented though >= size of proc
-					if first time getting this far, simply store first '.' location and length of free space.
-					else if an area already stored, overright if this has a larger free space.
-		insert prog at the stored '.' location
-
-		if proc not inserted
-			need to defrag and run again
-			if already degragged and still not added
-				exit simulation with 'out of memory' error
-	"""
-
+	def AddProc(self, process):
 	
-	""" # NONCONTIG - self explanatory
-	if mode == 'noncontig':
-		counter = """PROCSIZE"""
-		for i in range(1600):
-            if self.memory[i] == ".":
-                self.memory[i] = "procName"
-				counter -= 1
-				if counter == 0:
-					break
-		if counter != 0:
-			exit simulation with 'out of memory' error
-	"""
+    	#FIRST - puts new prog in first contiguous chunk of mem where it fits.--------------------------
+    	if mode == 'first':
+            startLock = False
+            startPos = 0
+            incrementAmount = 0
+            addSuccessful = False
+    		for i in range(1600):
+    			if self.memory[i] == "." and startLock == False:#start of free space
+    				startPos = i
+                    startLock = True
+
+                if startLock == True and i - startPos >= process.frames:#reach suitable amount of room
+                    for i in range(startPos, i + 1):
+                        self.memory[i] = process.uid
+                    addSuccessful = True
+                    break
+                
+    		if addSuccessful == False:
+                return False
+            else:
+                return True
+
+
+    """
+    	#BEST - puts new prog in smallest fitting chunk of free mem-------------------------------------
+    	if mode == 'best'
+    		increment through mem
+    			if '.' found
+    				remember that location
+    				increment as long as still '.', keeping track of how far youve incremented
+    					keep incrementing until not '.'
+    				if amount of '.' incremented though >= size of proc
+    					if first time getting this far, simply store first '.' location and length of free space.
+    					else if an area already stored, overright if this has a smaller free space.
+    		insert prog at the stored '.' location
+
+    		if proc not inserted
+    			need to defrag and run again
+    			if already degragged and still not added
+    				exit simulation with 'out of memory' error
+     
+    	#NEXT - puts new prog after all current progs---------------------------------------------------
+    	if mode == 'next'
+    		decrement through mem from end
+    			keep counter of how far you have decremented
+    			if something other than '.' found
+    				break
+    		if counter is >= prog size
+    			increment once (to be in empty mem again) and insert prog
+
+    		if proc not inserted
+    			need to defrag and run again
+    			if already degragged and still not added
+    				exit simulation with 'out of memory' error
+
+    	#WORST - puts new prog in largest fitting chunk of free mem-------------------------------------
+    	if mode == 'worst'
+    		increment through mem
+    			if '.' found
+    				remember that location
+    				increment as long as still '.', keeping track of how far youve incremented
+    					keep incrementing until not '.'
+    				if amount of '.' incremented though >= size of proc
+    					if first time getting this far, simply store first '.' location and length of free space.
+    					else if an area already stored, overright if this has a larger free space.
+    		insert prog at the stored '.' location
+
+    		if proc not inserted
+    			need to defrag and run again
+    			if already degragged and still not added
+    				exit simulation with 'out of memory' error
+    	"""
+
+    	
+    	""" # NONCONTIG - self explanatory
+    	if mode == 'noncontig':
+    		counter = """PROCSIZE"""
+    		for i in range(1600):
+                if self.memory[i] == ".":
+                    self.memory[i] = "procName"
+    				counter -= 1
+    				if counter == 0:
+    					break
+    		if counter != 0:
+    			exit simulation with 'out of memory' error
+    	"""
 
 
 class Process(object):
