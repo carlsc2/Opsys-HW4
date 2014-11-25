@@ -16,13 +16,11 @@ class Core(object):
         counter = 0
         for item in self.memory:
             stringHolder += item
-
             counter += 1
             if counter == self.framesPerLine:
                 counter = 0
                 print stringHolder
                 stringHolder = ""
-
 
     def SwapMemoryLocations(self, index1, index2):
         memHolder = self.memory[index1]
@@ -41,19 +39,23 @@ class Core(object):
 
     def run(self):
         #run the simulation -- if the quiet flag is specified, don't wait for user input
-        done = False
-        while not done:
-
+        while 1:
             #move time forward to the next event
+            ps = []#processes to start this frame
+            pe = []#processes to end this frame
             for process in self.processes:#find the next event
                 for i,k in enumerate(process.times):
                     s,e = k#get start and end times
                     if s == self.time:
-                        if not add_process(process):
-                            break
+                        ps.append(process)
                     elif e == self.time:
-                        remove_process(process)
-
+                        ps.append(process)
+            for process in pe:#for each process to end this frame
+                remove_process(process)#end it
+            for process in ps:#for each process to start this frame
+                if not add_process(process):#if the process failed to allocate memory, return
+                    print "Error: OUT-OF-MEMORY"
+                    return
 
             self.time += 1#increment time by 1 ms
 
