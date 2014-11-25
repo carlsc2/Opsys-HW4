@@ -4,7 +4,7 @@ import os.path
 
 class Core(object):
     def __init__(self,quiet,filename,mode):
-        self.memory = ["."]*1600#string that represents current state of memory
+        self.memory = ["#"]*80 + ["."]*1520#string that represents current state of memory
         self.framesPerLine = 80
         self.processes = parse_file(filename)#list of Process() instances
         self.quietmode = quiet #True = no interact, False = interact with user
@@ -136,14 +136,14 @@ class Core(object):
                     startLock = True
                 if startLock == True and self.memory[i] != "." or i == 1599:
                     startLock = False
-                    freelen = i -startPos
-                    print "freleen:",freelen
+                    freelen = i - startPos
                     if freelen >= process.frames:
                         if freelen < bestfree:
                             bestfree = freelen
+                            print "@@@@@@@@@@@@ bestfree: ",bestfree
                             beststart = startPos
             if bestfree <= 1600:
-                for i in range(startPos, startPos + process.frames):
+                for i in range(beststart, beststart + process.frames):
                     self.memory[i] = process.uid
                 return True
             else:
@@ -181,7 +181,7 @@ class Core(object):
                             bestfree = freelen
                             beststart = startPos
             if bestfree >= 0:
-                for i in range(startPos, startPos + process.frames):
+                for i in range(beststart, beststart + process.frames):
                     self.memory[i] = process.uid
                 return True
             else:
