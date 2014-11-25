@@ -1,3 +1,9 @@
+# Operating Systems Homework #4
+# Team Members:
+#   Craig Carlson
+#   Richard Pietrzak
+#   Domenic Cristaldi
+
 import re
 import sys
 import os.path
@@ -13,6 +19,7 @@ class Core(object):
         self.jumptime = 0
 
     def PrintMemory(self):
+        #Print the current state of the memory
         print "Memory at time %d:"%self.time
         stringHolder = ""
         counter = 0
@@ -25,6 +32,7 @@ class Core(object):
                 stringHolder = ""
 
     def SwapMemoryLocations(self, index1, index2):
+        #Swap memory between locations, used for defrag
         memHolder = self.memory[index1]
         self.memory[index1] = self.memory[index2]
         self.memory[index2] = memHolder
@@ -68,9 +76,9 @@ class Core(object):
                     try:
                         tmp = int(raw_input("Enter an integer t: "))
                         self.jumptime = tmp
-                        if tmp == 0:
+                        if tmp == 0:#if user enters 0, exit
                             return
-                        if tmp <= self.time:
+                        if tmp <= self.time:#ensure user enters valid time
                             print "ERROR: t must be greater than current time"
                         else:
                             break
@@ -84,13 +92,14 @@ class Core(object):
 
 
     def Defrag(self):
+        #Defrag memory
         ProcList = []
         print "Performing defragmentation..."
         first = False
         for i in range(1600):
-            if self.memory[i] == ".":
+            if self.memory[i] == ".":#set flag at first instance of free space
                 first = True
-            if self.memory[i] != ".":
+            if self.memory[i] != ".":#only shift memory once free space has been passed
                 if first and self.memory[i] not in ProcList:#get a list of all processes we touched
                     ProcList.append(self.memory[i])
                 indexHolder = i
@@ -140,10 +149,9 @@ class Core(object):
                 if startLock == True and self.memory[i] != "." or i == 1599:
                     startLock = False
                     freelen = i - startPos
-                    if freelen >= process.frames:
-                        if freelen < bestfree:
+                    if freelen >= process.frames:#if the free chunk has enough space
+                        if freelen < bestfree:#set it as the best one
                             bestfree = freelen
-                            print "@@@@@@@@@@@@ bestfree: ",bestfree
                             beststart = startPos
             if bestfree <= 1600:
                 for i in range(beststart, beststart + process.frames):
@@ -178,7 +186,7 @@ class Core(object):
                     startLock = True
                 if startLock == True and self.memory[i] != "." or i == 1599:
                     startLock = False
-                    freelen = i - startLock
+                    freelen = i - startPos
                     if freelen >= process.frames:
                         if freelen > bestfree:
                             bestfree = freelen
@@ -228,6 +236,7 @@ def parse_file(filename):#parse the input file, return a list of Process() insta
 
 
 def main():
+    #parse command-line arguments
     args = sys.argv
     if not (len(args) == 3 or len(args) == 4):
         print "USAGE: memsim [-q] <input-file> { noncontig | first | best | next | worst }"
@@ -244,8 +253,8 @@ def main():
         if mode not in modes:
             print "ERROR: Invalid mode"
             return
-        c = Core(quietmode, filename, mode)
-        c.run()
+        c = Core(quietmode, filename, mode)#pass command line args to core
+        c.run()#run simulation
 
 if __name__ == "__main__":
     main()
