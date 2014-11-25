@@ -21,11 +21,11 @@ def parse_file(filename):
         processdata = re.split(r'[ \t]+', line.rstrip())
         p.uid = processdata[0]
         p.frames = int(processdata[1])
-        p.times = zip(processdata[2::2], processdata[3::2])
+        p.times = zip([int(x) for x in processdata[2::2]], [int(x) for x in processdata[3::2]])
 
     return ret
 
 
 if(__name__ == "__main__"):
     for item in parse_file("inputFile.txt"):
-        print item
+        print item.uid, item.frames, item.times
