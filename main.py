@@ -10,8 +10,10 @@ class Core(object):
         self.quietmode = quiet #True = no interact, False = interact with user
         self.mode = mode#the algorithm to run
         self.time = 0
+        self.jumptime = 0
 
     def PrintMemory(self):
+        print "Memory at time %d:"%self.time
         stringHolder = ""
         counter = 0
         for item in self.memory:
@@ -39,7 +41,7 @@ class Core(object):
 
     def run(self):
         #run the simulation -- if the quiet flag is specified, don't wait for user input
-        while 1:
+        while True:
             #move time forward to the next event
             ps = []#processes to start this frame
             pe = []#processes to end this frame
@@ -49,16 +51,42 @@ class Core(object):
                     if s == self.time:
                         ps.append(process)
                     elif e == self.time:
-                        ps.append(process)
+                        pe.append(process)
             for process in pe:#for each process to end this frame
                 remove_process(process)#end it
+                if self.quietmode:#if automatic, print event
+                    self.PrintMemory()#print memory and time
             for process in ps:#for each process to start this frame
                 if not add_process(process):#if the process failed to allocate memory, return
-                    print "Error: OUT-OF-MEMORY"
-                    return
+                    self.Defrag()
+                    if not add_process(process):
+                        print "ERROR: OUT-OF-MEMORY"
+                        return
+                if self.quietmode:#if automatic, print event
+                    self.PrintMemory()#print memory and time
 
+            if not self.quietmode and self.time >= self.jumptime:#if not quiet mode, wait for user input
+                self.PrintMemory()#print memory and time
+                done = False
+                while not done:
+                    tmp = int(raw_input("Enter an integer t: "))
+                    if tmp == 0:
+                        return
+                    if tmp <= self.time:
+                        print "ERROR: t must be greater than current time"
+                    self.jumptime = tmp
             self.time += 1#increment time by 1 ms
 
+    def Defrag(self):
+        print "Performing defragmentation..."
+        for i in range(1600):
+            if self.memory[i] != ".":
+                indexHolder = i
+                #while there's room to push back and the previous area is free
+                while indexHolder > 0 and self.memory[indexHolder - 1] == ".":
+                    self.SwapMemoryLocations(indexHolder, indexHolder - 1)
+                    indexHolder -= 1
+        print "Defragmentation completed."
 
 class Process(object):
     def __init__(self):
@@ -100,6 +128,9 @@ def main():
             print "ERROR: Invalid mode"
             return
         c = Core(quietmode, filename, mode)
+
+        c.Defrag()
+        c.PrintMemory()
 
 if __name__ == "__main__":
     main()
