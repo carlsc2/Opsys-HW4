@@ -4,7 +4,7 @@ import os.path
 
 class Core(object):
     def __init__(self,quiet,filename,mode):
-        self.memory = "."*1600#string that represents current state of memory
+        self.memory = ["."]*1600#string that represents current state of memory
         self.framesPerLine = 80
         self.processes = parse_file(filename)#list of Process() instances
         self.quietmode = quiet #True = no interact, False = interact with user
@@ -35,26 +35,14 @@ class Core(object):
 
 
     def Defrag(self):
-        startFreeMem = 0
-        startLock = False
-        endFreeMem = 0
-        endLock = False
-
         for i in range(1600):
-            if self.memory[i] == "." && startLock == False:#set starting freespace location
-                startFreeMem = i
-                startLock = True
-            if self.memory[i] == "." && startLock == True:#set ending freespace location
-                endFreeMem = i
-                endLock = True
-            
-            if startLock == True && endLock == True:#swapping loop
-                for j in range(endFreeMem - startFreeMem):
-                    if (j + (endFreeMem - startFreeMem) < 1600):#make sure we don't go out of bounds
+            if self.memory[i] != ".":
+                indexHolder = i
+                #while there's room to push back and the previous area is free
+                while indexHolder > 0 and self.memory[indexHolder - 1] == ".":
+                    self.SwapMemoryLocations(indexHolder, indexHolder - 1)
+                    indexHolder -= 1
 
-
-                startLock = False
-                endFreeMem = False
 
 
 class Process(object):
@@ -97,6 +85,9 @@ def main():
             print "ERROR: Invalid mode"
             return
         c = Core(quietmode, filename, mode)
+
+        c.Defrag()
+        c.PrintMemory()
 
 if __name__ == "__main__":
     main()
