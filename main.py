@@ -35,10 +35,6 @@ class Core(object):
             if frame == process.uid:
                 frame = "."
 
-    def add_process(self, process):
-        #add a process to memory, return True if succeed, False if failed to add
-        pass
-
     def run(self):
         #run the simulation -- if the quiet flag is specified, don't wait for user input
         while True:
@@ -86,20 +82,18 @@ class Core(object):
                 while indexHolder > 0 and self.memory[indexHolder - 1] == ".":
                     self.SwapMemoryLocations(indexHolder, indexHolder - 1)
                     indexHolder -= 1
-<<<<<<< HEAD
+        print "Defragmentation completed."
 
-				
-	def AddProc(self, process):
-	
-    	#FIRST - puts new prog in first contiguous chunk of mem where it fits.--------------------------
-    	if mode == 'first':
+    def add_process(self, process):
+        #FIRST - puts new prog in first contiguous chunk of mem where it fits.--------------------------
+        if mode == 'first':
             startLock = False
             startPos = 0
             incrementAmount = 0
             addSuccessful = False
-    		for i in range(1600):
-    			if self.memory[i] == "." and startLock == False:#start of free space
-    				startPos = i
+            for i in range(1600):
+                if self.memory[i] == "." and startLock == False:#start of free space
+                    startPos = i
                     startLock = True
 
                 if startLock == True and i - startPos >= process.frames:#reach suitable amount of room
@@ -107,8 +101,8 @@ class Core(object):
                         self.memory[i] = process.uid
                     addSuccessful = True
                     break
-                
-    		if addSuccessful == False:
+
+            if addSuccessful == False:
                 return False
             else:
                 return True
@@ -131,7 +125,7 @@ class Core(object):
     			need to defrag and run again
     			if already degragged and still not added
     				exit simulation with 'out of memory' error
-     
+
     	#NEXT - puts new prog after all current progs---------------------------------------------------
     	if mode == 'next'
     		decrement through mem from end
@@ -162,12 +156,9 @@ class Core(object):
     			need to defrag and run again
     			if already degragged and still not added
     				exit simulation with 'out of memory' error
-    	"""
-
-    	
-    	""" # NONCONTIG - self explanatory
+    	# NONCONTIG - self explanatory
     	if mode == 'noncontig':
-    		counter = """PROCSIZE"""
+    		counter = "PROCSIZE"
     		for i in range(1600):
                 if self.memory[i] == ".":
                     self.memory[i] = "procName"
@@ -178,9 +169,6 @@ class Core(object):
     			exit simulation with 'out of memory' error
     	"""
 
-=======
-        print "Defragmentation completed."
->>>>>>> 9b0da5e901cc34f5d19a11d59d1053d5b5c3c790
 
 class Process(object):
     def __init__(self):
