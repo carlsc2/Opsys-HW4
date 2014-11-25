@@ -122,6 +122,19 @@ class Core(object):
 				exit simulation with 'out of memory' error
 	"""
 
+	
+	""" # NONCONTIG - self explanatory
+	if mode == 'noncontig':
+		counter = """PROCSIZE"""
+		for i in range(1600):
+            if self.memory[i] == ".":
+                self.memory[i] = "procName"
+				counter -= 1
+				if counter == 0:
+					break
+		if counter != 0:
+			exit simulation with 'out of memory' error
+	"""
 
 class Process(object):
     def __init__(self):
