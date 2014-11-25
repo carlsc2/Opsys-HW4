@@ -23,8 +23,6 @@ class Core(object):
                 counter = 0
                 print stringHolder
                 stringHolder = ""
-
-
                 
 
 
@@ -33,6 +31,11 @@ class Core(object):
         self.memory[index1] = self.memory[index2]
         self.memory[index2] = memHolder
 
+
+    def Defrag(self):
+        memSection = []
+        for i in range(1600):
+            print self.memory[i].uid
 
 
 class Process(object):
@@ -65,4 +68,5 @@ if(__name__ == "__main__"):
         print item.uid, item.frames, item.times
 
     c = Core()
-    c.PrintMemory()
+    #c.PrintMemory()
+    c.Defrag()
