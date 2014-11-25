@@ -78,21 +78,42 @@ class Core(object):
             self.time += 1#increment time by 1 ms
 
     def Defrag(self):
+        """
+        for i in range (80, 170):
+            self.memory[i] = "A"
+        for i in range(400, 598):
+            self.memory[i] = "B"
+        """
+
+        ProcList = list("")
+
         print "Performing defragmentation..."
         for i in range(1600):
             if self.memory[i] != ".":
+                if (self.memory[i] not in ProcList):#get a list of all processes we touched
+                    ProcList.append(self.memory[i])
+
                 indexHolder = i
                 #while there's room to push back and the previous area is free
                 while indexHolder > 0 and self.memory[indexHolder - 1] == ".":
                     self.SwapMemoryLocations(indexHolder, indexHolder - 1)
                     indexHolder -= 1
-<<<<<<< HEAD
+        print "Defragmentation completed."
 
+        freeBlockSize = 0
+        for item in self.memory:
+            if item == ".":
+                freeBlockSize += 1
+
+        freeBlockPercentage = float(freeBlockSize) / 1600
+
+        print "Relocated %d processes to create a free block of %d units (%f%% of total memory).\n" %(len(ProcList), freeBlockSize, freeBlockPercentage)
+        self.PrintMemory()
 				
 	def AddProc(self, process):
-	
+	   """
     	#FIRST - puts new prog in first contiguous chunk of mem where it fits.--------------------------
-    	if mode == 'first':
+        if self.mode == 'first':
             startLock = False
             startPos = 0
             incrementAmount = 0
@@ -113,8 +134,8 @@ class Core(object):
             else:
                 return True
 
-
-    """
+        """
+        """
     	#BEST - puts new prog in smallest fitting chunk of free mem-------------------------------------
     	if mode == 'best'
     		increment through mem
@@ -167,7 +188,7 @@ class Core(object):
     	
     	""" # NONCONTIG - self explanatory
     	if mode == 'noncontig':
-    		counter = """PROCSIZE"""
+    		counter = ""PROCSIZE"
     		for i in range(1600):
                 if self.memory[i] == ".":
                     self.memory[i] = "procName"
@@ -178,9 +199,6 @@ class Core(object):
     			exit simulation with 'out of memory' error
     	"""
 
-=======
-        print "Defragmentation completed."
->>>>>>> 9b0da5e901cc34f5d19a11d59d1053d5b5c3c790
 
 class Process(object):
     def __init__(self):
@@ -224,7 +242,7 @@ def main():
         c = Core(quietmode, filename, mode)
 
         c.Defrag()
-        c.PrintMemory()
+        #c.PrintMemory()
 
 if __name__ == "__main__":
     main()
