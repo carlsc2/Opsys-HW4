@@ -3,15 +3,13 @@ import sys
 import os.path
 
 class Core(object):
-    def __init__(self):
+    def __init__(self,quiet,filename,mode):
         self.isContiguous = True
-        self.memory = []
-
-        self.numProcessFrames = 1600
+        self.memory = "."*1600
         self.framesPerLine = 80
-
-        for i in range(self.numProcessFrames):
-            self.memory.append(Process())
+        self.processes = parse_file(filename)
+        self.quietmode = quiet
+        self.mode = mode
 
     def PrintMemory(self):
         stringHolder = ""
@@ -71,7 +69,7 @@ def main():
         if mode not in modes:
             print "ERROR: Invalid mode"
             return
-        print "filename --> %s \nmode --> %s"%(filename,mode)
+        c = Core(quietmode, filename, mode)
 
 if __name__ == "__main__":
     main()
