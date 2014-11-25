@@ -245,8 +245,5 @@ def main():
             return
         c = Core(quietmode, filename, mode)
 
-        c.Defrag()
-        #c.PrintMemory()
-
 if __name__ == "__main__":
     main()
