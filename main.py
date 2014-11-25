@@ -11,22 +11,23 @@ class Core(object):
         self.quietmode = quiet
         self.mode = mode
 
+    def FreeMemory(self, procName):
+        for i in range(1600):
+            if self.memory[i] == procName:
+                self.memory[i] = "."
+
     def PrintMemory(self):
         stringHolder = ""
         counter = 0
         for item in self.memory:
-            stringHolder += item.uid
+            stringHolder += item
 
             counter += 1
             if counter == self.framesPerLine:
                 counter = 0
                 print stringHolder
                 stringHolder = ""
-<<<<<<< HEAD
-                
 
-=======
->>>>>>> 9cb6e7e5d2b644b9b83cdaaef136d31157dce4b0
 
     def SwapMemoryLocations(self, index1, index2):
         memHolder = self.memory[index1]
@@ -35,10 +36,26 @@ class Core(object):
 
 
     def Defrag(self):
-        memSection = []
-        for i in range(1600):
-            print self.memory[i].uid
+        startFreeMem = 0
+        startLock = False
+        endFreeMem = 0
+        endLock = False
 
+        for i in range(1600):
+            if self.memory[i] == "." && startLock == False:#set starting freespace location
+                startFreeMem = i
+                startLock = True
+            if self.memory[i] == "." && startLock == True:#set ending freespace location
+                endFreeMem = i
+                endLock = True
+            
+            if startLock == True && endLock == True:#swapping loop
+                for j in range(endFreeMem - startFreeMem):
+                    if (j + (endFreeMem - startFreeMem) < 1600):#make sure we don't go out of bounds
+
+
+                startLock = False
+                endFreeMem = False
 
 class Process(object):
     def __init__(self):
@@ -62,15 +79,6 @@ def parse_file(filename):
     return ret
 
 
-<<<<<<< HEAD
-if(__name__ == "__main__"):
-    for item in parse_file("inputFile.txt"):
-        print item.uid, item.frames, item.times
-
-    c = Core()
-    #c.PrintMemory()
-    c.Defrag()
-=======
 def main():
     args = sys.argv
     if not (len(args) == 3 or len(args) == 4):
@@ -92,4 +100,3 @@ def main():
 
 if __name__ == "__main__":
     main()
->>>>>>> 9cb6e7e5d2b644b9b83cdaaef136d31157dce4b0
